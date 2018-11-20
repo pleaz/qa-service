@@ -16,10 +16,7 @@ install:
 - cp .env.travis .env
 
 script:
-- phpunit --coverage-text --coverage-clover=coverage.clover
-
-after_success:
-- php vendor/bin/ocular code-coverage:upload --format=php-clover coverage.clover
+- phpunit
 
 services:
 - mysql
@@ -31,3 +28,18 @@ cache:
 
 notifications:
   email: false
+
+env:
+  global:
+    - CC_TEST_REPORTER_ID=d0bfb8f2701ea8c14960a53c15fcbb3efbdfbd22697fcf440ce77f58a2d6a0b5
+language: ruby
+rvm:
+  - 2.2.0
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+script:
+  - bundle exec rspec
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

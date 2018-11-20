@@ -21,8 +21,6 @@ script:
 after_success:
 - php vendor/bin/ocular code-coverage:upload --format=php-clover coverage.clover
 
-after_success: sh -c "if [ ! -z ${COVERAGE+x} ]; then php vendor/bin/coveralls; fi"
-
 services:
 - mysql
 

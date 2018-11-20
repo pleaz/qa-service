@@ -16,7 +16,6 @@ install:
 - cp .env.travis .env
 
 script:
-- phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml
 - phpunit
 
 services:

@@ -1,0 +1,31 @@
+language: php
+
+php:
+- 7.2
+
+before_script:
+- composer self-update
+- composer install --no-interaction
+- php artisan key:generate
+- php artisan migrate
+
+before_install:
+- mysql -e 'CREATE DATABASE testing;'
+
+install:
+- cp .env.travis .env
+
+script:
+- phpdbg -qrr vendor/bin/phpunit --coverage-clover=coverage.xml
+- phpunit
+
+services:
+- mysql
+
+cache:
+  directories:
+  - node_modules
+  - vendor
+
+notifications:
+  email: false

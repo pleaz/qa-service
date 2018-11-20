@@ -1,5 +1,9 @@
-language: php
+env:
+  global:
+    - CC_TEST_REPORTER_ID=d0bfb8f2701ea8c14960a53c15fcbb3efbdfbd22697fcf440ce77f58a2d6a0b5
+    - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
 
+language: php
 php:
 - 7.2
 
@@ -8,6 +12,9 @@ before_script:
 - composer install --no-interaction
 - php artisan key:generate
 - php artisan migrate
+- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+- chmod +x ./cc-test-reporter
+- ./cc-test-reporter before-build
 
 before_install:
 - mysql -e 'CREATE DATABASE testing;'
@@ -16,7 +23,8 @@ install:
 - cp .env.travis .env
 
 script:
-- phpunit
+- phpunit --testsuite=unit --coverage-text --coverage-clover build/logs/clover.xml
+- if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT; fi
 
 services:
 - mysql
@@ -28,18 +36,3 @@ cache:
 
 notifications:
   email: false
-
-env:
-  global:
-    - CC_TEST_REPORTER_ID=d0bfb8f2701ea8c14960a53c15fcbb3efbdfbd22697fcf440ce77f58a2d6a0b5
-language: ruby
-rvm:
-  - 2.2.0
-before_script:
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
-script:
-  - bundle exec rspec
-after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT

@@ -16,7 +16,10 @@ install:
 - cp .env.travis .env
 
 script:
-- phpunit
+- phpunit --coverage-text --coverage-clover=coverage.clover
+
+after_success:
+- php vendor/bin/ocular code-coverage:upload --format=php-clover coverage.clover
 
 services:
 - mysql
